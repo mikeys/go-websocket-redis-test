@@ -21,13 +21,13 @@ type response struct {
 	value string
 }
 
-func (conn *connection) redisFetchAsync(key string) {
+func (conn *connection) redisFetch(key string) {
 	redisConn := redisPool.Get()
 	defer redisConn.Close()
 	reply, err := redis.String(redisConn.Do("GET", key))
 	
 	if err != nil {
-		reply = ""
+		reply = "Key not found."
 	}
 
 	// 3. Send response back to client (async) through the hub.
@@ -45,7 +45,7 @@ func (conn *connection) reader() {
 		}
 
 		// 2. Fetch value from redis (async)
-		go conn.redisFetchAsync(key)
+		go conn.redisFetch(key)
 	}
 
 	conn.ws.Close()

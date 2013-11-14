@@ -1,5 +1,9 @@
 package main
 
+import (
+	"log"
+)
+
 type hub struct {
 	// Register response to the connections.
 	respond chan *response
@@ -25,8 +29,10 @@ func (h *hub) run() {
 	for {
 		select {
 			case conn := <-h.register:
+				log.Printf("Connection registered")
 				h.connections[conn] = true
 			case conn := <-h.unregister:
+				log.Printf("Connection unregistered")
 				delete(h.connections, conn)
 				close(conn.send)
 			case response := <-h.respond:
